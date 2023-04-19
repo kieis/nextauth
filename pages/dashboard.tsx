@@ -3,9 +3,11 @@ import { AuthContext } from "../contexts/AuthContext";
 import { setupApiClient } from "../services/api";
 import { api } from "../services/apiClient";
 import { withSSRAuth } from "../utils/withSSRAuth";
+import { useCan } from "../hooks/useCan";
+import { Can } from "../components/Can";
 
 export default function Dashboard() {
-  const { user } = useContext(AuthContext);
+  const { user, signIn, signOut } = useContext(AuthContext);
 
   useEffect(() => {
     api
@@ -16,7 +18,15 @@ export default function Dashboard() {
       });
   }, []);
 
-  return <h1>{user?.email}</h1>;
+  return (
+    <>
+      <button onClick={signOut}>Sign out</button>
+      <h1>{user?.email}</h1>
+      <Can permissions={["metrics.list"]}>
+        <p>metrics</p>
+      </Can>
+    </>
+  );
 }
 
 export const getServerSideProps = withSSRAuth(async (ctx) => {
