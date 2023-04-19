@@ -21,10 +21,6 @@ type AuthContextData = {
   isAuthenticated: boolean;
 };
 
-type MessageData = unknown & {
-  data: string;
-};
-
 type AuthProviderProps = {
   children: ReactNode;
 };
@@ -37,11 +33,11 @@ let authChannel: BroadcastChannel;
 // localStorage ~ won't work on next, because next is server side
 // cookies
 
-export function signOut() {
+export function signOut(shouldBroadCast = true) {
   destroyCookie(undefined, "nextauth.token");
   destroyCookie(undefined, "nextauth.refreshToken");
 
-  authChannel.postMessage("signOut");
+  shouldBroadCast && authChannel.postMessage("signOut");
 
   Router.push("/");
 }
@@ -56,7 +52,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     authChannel.onmessage = (message) => {
       switch (message.data) {
         case "signOut":
-          //Router.push("/");
+          signOut(false);
           break;
       }
     };
